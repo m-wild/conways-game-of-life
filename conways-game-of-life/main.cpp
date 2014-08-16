@@ -14,27 +14,50 @@
 const GLint WINDOW_WIDTH = 800;
 const GLint WINDOW_HEIGHT = 600;
 
+/*
+Any live cell with fewer than two live neighbours dies, as if caused by under-population.
+Any live cell with two or three live neighbours lives on to the next generation.
+Any live cell with more than three live neighbours dies, as if by overcrowding.
+Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+*/
+
+int count = 0;
+
 // main drawing function
 void display(void)
 {
+    glClear(GL_COLOR_BUFFER_BIT);
+    glPointSize(5);
     
+    glColor3f(0.0, 0.0, 0.0);
+    
+    glBegin(GL_POINTS);
+    
+    glVertex2f(0.0, 0.0);
+    
+    glVertex2f(10.0, count);
+    
+    glEnd();
+   
+    glFlush();
 }
+
+// main game loop
+void animate(void)
+{
+    count++;
+    
+    glutPostRedisplay();
+}
+
 
 // initialize the view
 void init(void)
 {
     glClearColor(1.0, 1.0, 1.0, 0.0); // white
-    
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    
-    GLdouble halfWidth = (GLdouble) WINDOW_WIDTH / 2.0;
-    GLdouble halfHeight = (GLdouble) WINDOW_HEIGHT / 2.0;
-    
     gluOrtho2D(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
-    
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
 }
 
 // Main program entry point
@@ -47,8 +70,8 @@ int main(int argc, char * argv[])
     glutCreateWindow("Conway's Game of Life");
     
     init(); // initialize the view
-    
     glutDisplayFunc(display); // draw scene
+    glutIdleFunc(animate);  // move the game
     
     glutMainLoop();
     
