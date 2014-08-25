@@ -39,8 +39,11 @@ const int boardWidth = WINDOW_WIDTH / 4.f;
 const int boardHeight = WINDOW_HEIGHT / 4.f;
 
 int board[boardWidth * boardHeight];
+int boardBuffer[boardWidth * boardHeight];
 
 bool simulationRunning = false;
+int simulationPeriod = 20; // number of frames per update
+int currentPeriod = 0;
 
 SDL_Window* sdlWindow = NULL;
 SDL_GLContext sdlGlContext;
@@ -108,10 +111,32 @@ int main(int argc, char* argv[])
 ///
 void handleKeys(unsigned char key, int x, int y)
 {
-    if (key == 'r')
+    // start/stop running
+	if (key == 'r')
     {
         simulationRunning = !simulationRunning;
     }
+	// clear the board
+	else if (key == 'c')
+	{
+		for (int i = 0; i < boardWidth * boardHeight; i++)
+		{
+			board[i] = 0;
+		}
+	}
+	// adjust simulation period
+	else if (key == '=')
+	{
+		simulationPeriod -= 2;
+		if (simulationPeriod < 1)
+		{
+			simulationPeriod = 1;
+		}
+	}
+	else if (key == '-')
+	{
+		simulationPeriod += 2;
+	}
 }
 
 ///
@@ -119,10 +144,17 @@ void handleKeys(unsigned char key, int x, int y)
 ///
 void handleMouse(int x, int y)
 {
-    x = ((WINDOW_WIDTH + x) / 4) - 1;
+    x = ((WINDOW_WIDTH + x) / 4);
     y = ((WINDOW_HEIGHT - y) / 4) - 1;
     
-    board[(y * boardWidth) + x] = 1;
+	if (board[(y * boardWidth) + x] == 0)
+	{
+		board[(y * boardWidth) + x] = 1;
+	}
+	else
+	{
+		board[(y * boardWidth) + x] = 0;
+	}
 }
 
 ///
@@ -132,44 +164,58 @@ void update()
 {
     if (simulationRunning)
     {
-        // 0 = dead
-        // 1 = alive
-        for (int y = 1; y < boardHeight - 1; y++)
-        {
-            for (int x = 1; x < boardWidth - 1; x++)
-            {
-                int numNeighbors = board[((y - 1) * boardWidth) + x - 1]
-                    + board[((y - 1) * boardWidth) + x]
-                    + board[((y - 1) * boardWidth) + x + 1]
-                    + board[(y * boardWidth) + x - 1]
-                    + board[(y * boardWidth) + x + 1]
-                    + board[((y + 1) * boardWidth) + x - 1]
-                    + board[((y + 1) * boardWidth) + x]
-                    + board[((y + 1) * boardWidth) + x + 1];
-            
-                // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
-                if ((board[(y * boardWidth) + x] == 0) && (numNeighbors == 3))
-                {
-                    board[(y * boardWidth) + x] = 1;
-                }
-                // Any live cell with fewer than two live neighbours dies, as if caused by under-population.
-                else if ((board[(y * boardWidth) + x] == 1) && (numNeighbors < 2))
-                {
-                    board[(y * boardWidth) + x] = 0;
-                }
-                // Any live cell with two or three live neighbours lives on to the next generation.
-                else if ((board[(y * boardWidth) + x] == 1) && (numNeighbors == 2) && (numNeighbors == 3))
-                {
-                    board[(y * boardWidth) + x] = 1; // could be optimized out
-                }
-                // Any live cell with more than three live neighbours dies, as if by overcrowding.
-                else if ((board[(y * boardWidth) + x] == 1) && (numNeighbors > 3))
-                {
-                    board[(y * boardWidth) + x] = 0;
-                }
-            
-            }
-        }
+		if ((currentPeriod % simulationPeriod) == 0)
+		{
+			currentPeriod = 1;
+			
+			// 0 = dead
+			// 1 = alive
+			for (int y = 1; y < boardHeight - 1; y++)
+			{
+				for (int x = 1; x < boardWidth - 1; x++)
+				{
+					int numNeighbors = board[((y - 1) * boardWidth) + x - 1]
+						+ board[((y - 1) * boardWidth) + x]
+						+ board[((y - 1) * boardWidth) + x + 1]
+						+ board[(y * boardWidth) + x - 1]
+						+ board[(y * boardWidth) + x + 1]
+						+ board[((y + 1) * boardWidth) + x - 1]
+						+ board[((y + 1) * boardWidth) + x]
+						+ board[((y + 1) * boardWidth) + x + 1];
+				
+					// Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+					if ((board[(y * boardWidth) + x] == 0) && (numNeighbors == 3))
+					{
+						boardBuffer[(y * boardWidth) + x] = 1;
+					}
+					// Any live cell... 
+					else if (board[(y * boardWidth) + x] == 1)
+					{
+						// ... with fewer than two live neighbours dies, as if caused by under-population.
+						// ... with more than three live neighbours dies, as if by overcrowding.
+						if ((numNeighbors < 2) || (numNeighbors > 3))
+						{
+							boardBuffer[(y * boardWidth) + x] = 0;
+						}
+						// ... with two or three live neighbours lives on to the next generation.
+						else if ((numNeighbors == 2) || (numNeighbors == 3))
+						{
+							boardBuffer[(y * boardWidth) + x] = 1;
+						}
+					}
+				}
+			}
+			
+			// swap buffers
+			for (int i = 0; i < boardWidth * boardHeight; i++)
+			{
+				board[i] = boardBuffer[i];
+			}
+		}
+		else
+		{
+			currentPeriod++;
+		}
     }
 }
 
