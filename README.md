@@ -2,6 +2,8 @@
 
 Built in C++ with SDL2 and OpenGL 2.1
 
+[Conway's Game of Life - Wikipedia](http://en.wikipedia.org/wiki/Conway's_Game_of_Life)
+
 ###Dependencies
 - OpenGL 2.1
 - SDL2
