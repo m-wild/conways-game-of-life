@@ -16,7 +16,8 @@
 // Function stubs
 bool init();
 bool initGL();
-void handleKeys(unsigned char key, GLint x, GLint y);
+void handleKeys(unsigned char key, int x, int y);
+void handleMouse(int x, int y);
 void update();
 void render();
 void close();
@@ -30,7 +31,7 @@ const int boardHeight = WINDOW_HEIGHT / 4.f;
 
 int board[boardWidth * boardHeight];
 
-int globalCount = 0;
+bool simulationRunning = false;
 
 SDL_Window* sdlWindow = NULL;
 SDL_GLContext sdlGlContext;
@@ -51,33 +52,36 @@ int main(int argc, char* argv[])
         
         SDL_StartTextInput();
         
-        // Main loop
+        // Main game loop
         while (!quit)
         {
+            // Handle events and update the game state
             while (SDL_PollEvent(&e) != 0)
             {
-                // User requests quit
                 if (e.type == SDL_QUIT)
                 {
                     quit = true;
                 }
-                // Handle keypress with mouse position
                 else if (e.type == SDL_TEXTINPUT)
                 {
-                    GLint x = 0, y = 0;
+                    int x = 0, y = 0;
                     SDL_GetMouseState(&x, &y);
                     
                     handleKeys(e.text.text[0], x, y);
                 }
+                else if (e.type == SDL_MOUSEBUTTONDOWN)
+                {
+                    int x = 0, y = 0;
+                    SDL_GetMouseState(&x, &y);
+                    
+                    handleMouse(x, y);
+                }
+                
             }
-            
-            // Update the game state
             update();
             
-            // OpenGL render
+            // GL render and swap buffers
             render();
-            
-            // Update the screen
             SDL_GL_SwapWindow(sdlWindow);
 
         }
@@ -93,9 +97,23 @@ int main(int argc, char* argv[])
 ///
 /// Handle keypress with mouse position
 ///
-void handleKeys(unsigned char key, GLint x, GLint y)
+void handleKeys(unsigned char key, int x, int y)
 {
-     // Keypress handling here!
+    if (key == 'r')
+    {
+        simulationRunning = !simulationRunning;
+    }
+}
+
+///
+/// Handle mouse event
+///
+void handleMouse(int x, int y)
+{
+    x = ((WINDOW_WIDTH + x) / 4) - 1;
+    y = ((WINDOW_HEIGHT - y) / 4) - 1;
+    
+    board[(y * boardWidth) + x] = 1;
 }
 
 ///
@@ -103,26 +121,47 @@ void handleKeys(unsigned char key, GLint x, GLint y)
 ///
 void update()
 {
-    
-    /*
-     Any live cell with fewer than two live neighbours dies, as if caused by under-population.
-     Any live cell with two or three live neighbours lives on to the next generation.
-     Any live cell with more than three live neighbours dies, as if by overcrowding.
-     Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
-     */
-    
-    
-    for (int y = 0; y < boardHeight; y++)
+    if (simulationRunning)
     {
-        for (int x = 0; x < boardWidth; x++)
+        // 0 = dead
+        // 1 = alive
+        for (int y = 1; y < boardHeight - 1; y++)
         {
-            board[(y * boardWidth) + x] = (globalCount + x + y) % 5;
+            for (int x = 1; x < boardWidth - 1; x++)
+            {
+                int numNeighbors = board[((y - 1) * boardWidth) + x - 1]
+                    + board[((y - 1) * boardWidth) + x]
+                    + board[((y - 1) * boardWidth) + x + 1]
+                    + board[(y * boardWidth) + x - 1]
+                    + board[(y * boardWidth) + x + 1]
+                    + board[((y + 1) * boardWidth) + x - 1]
+                    + board[((y + 1) * boardWidth) + x]
+                    + board[((y + 1) * boardWidth) + x + 1];
+            
+                // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+                if ((board[(y * boardWidth) + x] == 0) && (numNeighbors == 3))
+                {
+                    board[(y * boardWidth) + x] = 1;
+                }
+                // Any live cell with fewer than two live neighbours dies, as if caused by under-population.
+                else if ((board[(y * boardWidth) + x] == 1) && (numNeighbors < 2))
+                {
+                    board[(y * boardWidth) + x] = 0;
+                }
+                // Any live cell with two or three live neighbours lives on to the next generation.
+                else if ((board[(y * boardWidth) + x] == 1) && (numNeighbors == 2) && (numNeighbors == 3))
+                {
+                    board[(y * boardWidth) + x] = 1; // could be optimized out
+                }
+                // Any live cell with more than three live neighbours dies, as if by overcrowding.
+                else if ((board[(y * boardWidth) + x] == 1) && (numNeighbors > 3))
+                {
+                    board[(y * boardWidth) + x] = 0;
+                }
+            
+            }
         }
     }
-    
-    globalCount++;
-    
-
 }
 
 ///
@@ -139,9 +178,9 @@ void render()
     glBegin(GL_POINTS);
     
     
-    for (int y = 0; y < boardHeight; y++)
+    for (int y = 1; y < boardHeight - 1; y++)
     {
-        for (int x = 0; x < boardWidth; x++)
+        for (int x = 1; x < boardWidth - 1; x++)
         {
             if (board[(y * boardWidth) + x] != 0)
             {
@@ -170,7 +209,7 @@ bool init()
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
         
-        if ((sdlWindow = SDL_CreateWindow("Conway's Game of Life", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL)) == NULL)
+        if ((sdlWindow = SDL_CreateWindow("Conway's Game of Life", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE)) == NULL)
         {
             std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
             success = false;
