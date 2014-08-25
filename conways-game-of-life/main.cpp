@@ -6,11 +6,20 @@
 ///  Copyright (c) 2014 Michael Wildman. All rights reserved.
 ///
 
+#ifdef _WIN32
+#include <Windows.h>
+#include <SDL2/sdl.h>
+#undef main
+#include <Gl/glu.h>
+#else
+#include <SDL2/sld.h>
+#include <OpenGL/glu.h>
+#endif //_WIN32
+
 
 #include <iostream>
-#include <SDL2/sdl.h>
 #include <SDL2/SDL_opengl.h>
-#include <OpenGl/glu.h>
+
 
 
 // Function stubs

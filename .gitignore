@@ -1,5 +1,6 @@
 .DS_Store
 target/*
+_target/*
 
 # Compiled Object files
 *.slo
