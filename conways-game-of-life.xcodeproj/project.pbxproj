@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		4C09CEDF199F70C1003B9069 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C09CEDE199F70C1003B9069 /* main.cpp */; };
 		4C09CEE8199F760B003B9069 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C09CEE7199F760B003B9069 /* OpenGL.framework */; };
-		4C09CEEA199F7611003B9069 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C09CEE9199F7611003B9069 /* GLUT.framework */; };
+		4C8C4BE1199FFE5E00D05380 /* libSDL2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8C4BE0199FFE5E00D05380 /* libSDL2.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,7 +28,7 @@
 		4C09CEDB199F70C1003B9069 /* conways-game-of-life */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "conways-game-of-life"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C09CEDE199F70C1003B9069 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		4C09CEE7199F760B003B9069 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
-		4C09CEE9199F7611003B9069 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
+		4C8C4BE0199FFE5E00D05380 /* libSDL2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSDL2.dylib; path = ../../../../usr/local/Cellar/sdl2/2.0.3/lib/libSDL2.dylib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,8 +36,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C8C4BE1199FFE5E00D05380 /* libSDL2.dylib in Frameworks */,
 				4C09CEE8199F760B003B9069 /* OpenGL.framework in Frameworks */,
-				4C09CEEA199F7611003B9069 /* GLUT.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -47,7 +47,7 @@
 		4C09CED2199F70C1003B9069 = {
 			isa = PBXGroup;
 			children = (
-				4C09CEE9199F7611003B9069 /* GLUT.framework */,
+				4C8C4BE0199FFE5E00D05380 /* libSDL2.dylib */,
 				4C09CEE7199F760B003B9069 /* OpenGL.framework */,
 				4C09CEDD199F70C1003B9069 /* conways-game-of-life */,
 				4C09CEDC199F70C1003B9069 /* Products */,
@@ -201,6 +201,15 @@
 		4C09CEE5199F70C1003B9069 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/local/Cellar/sdl2/2.0.3/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/Cellar/sdl2/2.0.3/lib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -208,6 +217,15 @@
 		4C09CEE6199F70C1003B9069 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/local/Cellar/sdl2/2.0.3/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/Cellar/sdl2/2.0.3/lib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -231,6 +249,7 @@
 				4C09CEE6199F70C1003B9069 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
