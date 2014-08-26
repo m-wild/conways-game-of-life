@@ -299,40 +299,25 @@ bool init()
 // Initialize OpenGL (Projection, ModelView, ClearColor)
 bool initGL()
 {
-    bool success = true;
-    GLenum error = GL_NO_ERROR;
-    
     // Initialize gl projection matrix
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluOrtho2D(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
-    
-    if ((error = glGetError()) != GL_NO_ERROR)
-    {
-        std::cout << "Error initializing OpenGL! " << std::endl << gluErrorString(error) << std::endl;
-        success = false;
-    }
+    glOrtho(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT, -1.f, 1.f);
     
     // Initialize Modelview matrix
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     
-    if ((error = glGetError()) != GL_NO_ERROR)
-    {
-        std::cout << "Error initializing OpenGL! " << std::endl << gluErrorString(error) << std::endl;
-        success = false;
-    }
-    
     // Set clear color
     glClearColor(1.f, 1.f, 1.f, 0.f);
     
-    if ((error = glGetError()) != GL_NO_ERROR)
+    if (glGetError() != GL_NO_ERROR)
     {
-        std::cout << "Error initializing OpenGL! " << std::endl << gluErrorString(error) << std::endl;
-        success = false;
+        std::cout << "Error initializing OpenGL! GL Error: " << glGetError() << std::endl;
+        return false;
     }
     
-    return success;
+    return true;
 }
 
 // Shutdown SDL
