@@ -12,7 +12,7 @@
 #undef main
 #include <Gl/glu.h>
 #else
-#include <SDL2/sld.h>
+#include <SDL2/SDL.h>
 #include <OpenGL/glu.h>
 #endif //_WIN32
 
