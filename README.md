@@ -5,10 +5,11 @@ Built in C++ with SDL2 and OpenGL 2.1
 [Conway's Game of Life - Wikipedia](http://en.wikipedia.org/wiki/Conway's_Game_of_Life)
 
 ###Controls
-`r` toggle the game running/stopped
-`c` clear the board
-`=` increase speed
-`-` decrease speed
+- `r` toggle the game running/stopped
+- `s` seed a (semi) random board
+- `c` clear the board
+- `=` increase speed
+- `-` decrease speed
 
 
 ###Dependencies
