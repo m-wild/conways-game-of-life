@@ -27,6 +27,7 @@ bool init();
 bool initGL();
 void handleKeys(unsigned char key, int x, int y);
 void handleMouse(int x, int y);
+void seedRandomBoard();
 void update();
 void render();
 void close();
@@ -137,6 +138,10 @@ void handleKeys(unsigned char key, int x, int y)
 	{
 		simulationPeriod += 2;
 	}
+    else if (key == 's')
+    {
+        seedRandomBoard();
+    }
 }
 
 ///
@@ -155,6 +160,21 @@ void handleMouse(int x, int y)
 	{
 		board[(y * boardWidth) + x] = 0;
 	}
+}
+
+//
+// Seed a random game board
+void seedRandomBoard()
+{
+    srand((uint) time(NULL));
+    
+    for (int y = 1; y < boardHeight - 1; y++)
+    {
+        for (int x = 1; x < boardWidth - 1; x++)
+        {
+            board[(y * boardWidth) + x] = rand() % 2;
+        }
+    }
 }
 
 ///
@@ -248,6 +268,7 @@ void render()
     
 }
 
+//
 // Initialize everything
 bool init()
 {
@@ -296,6 +317,7 @@ bool init()
     return success;
 }
 
+//
 // Initialize OpenGL (Projection, ModelView, ClearColor)
 bool initGL()
 {
@@ -320,6 +342,7 @@ bool initGL()
     return true;
 }
 
+//
 // Shutdown SDL
 void close()
 {
